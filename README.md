@@ -1,6 +1,6 @@
 # StatefulModel
 these classes are frequent use of stateful Models for M-V-Whatever.
-PCL(Portable Class Library & ) & MIT License.
+PCL(Portable Class Library) & MIT License.
 
 supported
 - .NET Framework 4.5
@@ -37,10 +37,9 @@ ToSyncedXXX Methods is creating one-way synchronized collection with source coll
 ```
 
 ### Sync Collections
+While creating one-way synchronized collection, this method lock source collection, so no leak items.
 ![image](./images/syncCollections.png)
 ### Detach
-While creating one-way synchronized collection, this method lock source collection, so no leak.
-
 ISynchronizableNotifyChangedCollection < T > is IDisposable. When Dispose() called , all EventHandler from source collection will be detached.
 ![image](./images/detach.png)
 
@@ -61,16 +60,12 @@ PropertyChangedEventListener/CollectionChangedEventListener
 	//when dispose() called, detach all handler
 	listerner.Dispose();
 ```
-
-## Other Classes
-
-- CompositeDiposable -  Rx like CompositeDisposable
-
 ### WeakEventListeners
 
 - PropertyChangedWeakEventListener (PropertyChangedEventListener by weak event)
 - CollectionChangedWeakEventListener (CollectionChangedWeakEventListener by weak event)
 - WeakEventListener (all‐purpose weak event listener)
+
 ```csharp
 
 	var button = new Button(){Width = 100,Height = 100};
@@ -82,7 +77,6 @@ PropertyChangedEventListener/CollectionChangedEventListener
 		(sender,e) => button.Content = "Clicked!!");
 
 ```
-
 ### Anonymouses
 
 - AnonymousComparer < T >
@@ -90,6 +84,10 @@ PropertyChangedEventListener/CollectionChangedEventListener
 - AnonymousSynchronizationContext
 etc
 
+## Other Classes
+
+- CompositeDiposable -  Rx like CompositeDisposable
+etc
 
 
 
