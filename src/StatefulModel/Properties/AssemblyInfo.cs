@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyCopyright("Copyright (C) Masanori Onoue,  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: NeutralResourcesLanguage("ja")]
+[assembly: NeutralResourcesLanguage("en-US")]
 
 // アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 //
