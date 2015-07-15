@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using StatefulModel.EventListeners;
+using StatefulModel.EventListeners.WeakEvents;
 
 namespace StatefulModel
 {
@@ -30,8 +31,8 @@ namespace StatefulModel
             {
                 SourceCollection = collection;
 
-                EventListeners.Add(new PropertyChangedEventListener(SourceCollection, (sender, e) => OnPropertyChanged(e)));
-                EventListeners.Add(new CollectionChangedEventListener(SourceCollection, (sender, e) => OnCollectionChanged(e)));
+                EventListeners.Add(new PropertyChangedWeakEventListener(SourceCollection, (sender, e) => OnPropertyChanged(e)));
+                EventListeners.Add(new CollectionChangedWeakEventListener(SourceCollection, (sender, e) => OnCollectionChanged(e)));
             }
         }
 
