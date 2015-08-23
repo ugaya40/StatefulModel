@@ -9,7 +9,7 @@ namespace StatefulModel.EventListeners.WeakEvents
         private EventHandler<TEventArgs> _handler;
         private THandler _resultHandler;
         private Action<THandler> _remove;
-        private bool _initialized;
+        private readonly bool _initialized;
 
         private static void ReceiveEvent(WeakReference<WeakEventListener<THandler, TEventArgs>> listenerWeakReference, object sender, TEventArgs args)
         {
@@ -17,12 +17,7 @@ namespace StatefulModel.EventListeners.WeakEvents
 
             if (listenerWeakReference.TryGetTarget(out listenerResult))
             {
-                var handler = listenerResult._handler;
-
-                if (handler != null)
-                {
-                    handler(sender, args);
-                }
+                listenerResult._handler?.Invoke(sender,args);
             }
         }
 
@@ -40,10 +35,10 @@ namespace StatefulModel.EventListeners.WeakEvents
         {
             if (_initialized) return;
 
-            if (conversion == null) throw new ArgumentNullException("conversion");
-            if (add == null) throw new ArgumentNullException("add");
-            if (remove == null) throw new ArgumentNullException("remove");
-            if (handler == null) throw new ArgumentNullException("handler");
+            if (conversion == null) throw new ArgumentNullException(nameof(conversion));
+            if (add == null) throw new ArgumentNullException(nameof(add));
+            if (remove == null) throw new ArgumentNullException(nameof(remove));
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
 
             _handler = handler;
             _remove = remove;

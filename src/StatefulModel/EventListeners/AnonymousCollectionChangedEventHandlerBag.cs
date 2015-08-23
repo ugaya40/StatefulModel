@@ -8,26 +8,26 @@ namespace StatefulModel.EventListeners
 {
     internal class AnonymousCollectionChangedEventHandlerBag : IEnumerable<KeyValuePair<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>>
     {
-        private Dictionary<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>> _handlerDictionary = new Dictionary<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>();
-        private WeakReference<INotifyCollectionChanged> _source;
+        private readonly Dictionary<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>> _handlerDictionary = new Dictionary<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>();
+        private readonly WeakReference<INotifyCollectionChanged> _source;
 
-        private List<NotifyCollectionChangedEventHandler> _allHandlerList = new List<NotifyCollectionChangedEventHandler>();
+        private readonly List<NotifyCollectionChangedEventHandler> _allHandlerList = new List<NotifyCollectionChangedEventHandler>();
 
-        private Dictionary<List<NotifyCollectionChangedEventHandler>, object> _lockObjectDictionary = new Dictionary<List<NotifyCollectionChangedEventHandler>, object>();
+        private readonly Dictionary<List<NotifyCollectionChangedEventHandler>, object> _lockObjectDictionary = new Dictionary<List<NotifyCollectionChangedEventHandler>, object>();
 
-        private object _handlerDictionaryLockObject = new object();
-        private object _allHandlerListLockObject = new object();
+        private readonly object _handlerDictionaryLockObject = new object();
+        private readonly object _allHandlerListLockObject = new object();
 
         internal AnonymousCollectionChangedEventHandlerBag(INotifyCollectionChanged source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             _source = new WeakReference<INotifyCollectionChanged>(source);
         }
 
         internal AnonymousCollectionChangedEventHandlerBag(INotifyCollectionChanged source, NotifyCollectionChangedEventHandler handler)
             : this(source)
         {
-            if (handler == null) throw new ArgumentNullException("handler");
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
             RegisterHandler(handler);
         }
 
@@ -90,24 +90,13 @@ namespace StatefulModel.EventListeners
         }
 
         IEnumerator<KeyValuePair<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>> IEnumerable<KeyValuePair<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>>.GetEnumerator()
-        {
-            return _handlerDictionary.GetEnumerator();
-        }
+            => _handlerDictionary.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _handlerDictionary.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => _handlerDictionary.GetEnumerator();
 
-        internal void Add(NotifyCollectionChangedEventHandler handler)
-        {
-            RegisterHandler(handler);
-        }
+        internal void Add(NotifyCollectionChangedEventHandler handler) => RegisterHandler(handler);
 
-        internal void Add(NotifyCollectionChangedAction action, NotifyCollectionChangedEventHandler handler)
-        {
-            RegisterHandler(action, handler);
-        }
+        internal void Add(NotifyCollectionChangedAction action, NotifyCollectionChangedEventHandler handler) => RegisterHandler(action, handler);
 
 
         internal void Add(NotifyCollectionChangedAction action, params NotifyCollectionChangedEventHandler[] handlers)

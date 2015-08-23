@@ -6,7 +6,7 @@ namespace StatefulModel.EventListeners
 {
     public sealed class CollectionChangedEventListener : EventListener<NotifyCollectionChangedEventHandler>, IEnumerable<KeyValuePair<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>>
     {
-        private AnonymousCollectionChangedEventHandlerBag _bag;
+        private readonly AnonymousCollectionChangedEventHandlerBag _bag;
 
         public CollectionChangedEventListener(INotifyCollectionChanged source)
         {
@@ -51,17 +51,20 @@ namespace StatefulModel.EventListeners
 
         public void Add(NotifyCollectionChangedEventHandler handler)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(handler);
         }
 
         public void Add(NotifyCollectionChangedAction action, NotifyCollectionChangedEventHandler handler)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(action, handler);
         }
 
 
         public void Add(NotifyCollectionChangedAction action, params NotifyCollectionChangedEventHandler[] handlers)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(action, handlers);
         }
     }

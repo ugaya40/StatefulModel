@@ -5,7 +5,7 @@ namespace StatefulModel
 {
     public class AnonymousComparer<T> : IComparer<T>
     {
-        private Func<T, T, int> _comparer;
+        private readonly Func<T, T, int> _comparer;
         public AnonymousComparer(Func<T, T, int> comparer)
         {
             _comparer = comparer;

@@ -3,25 +3,18 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
-using System.Threading;
-using StatefulModel.EventListeners;
 using StatefulModel.EventListeners.WeakEvents;
 
 namespace StatefulModel
 {
-    public class ReadOnlyNotifyChangedCollection<T> : ReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
+    public sealed class ReadOnlyNotifyChangedCollection<T> : ReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
     {
-        private bool _disposed;
-
-        private bool _isDisposableType;
+        private readonly bool _isDisposableType;
 
         public ReadOnlyNotifyChangedCollection(ISynchronizableNotifyChangedCollection<T> collection)
             : base(collection)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             EventListeners = new CompositeDisposable();
 
@@ -36,70 +29,39 @@ namespace StatefulModel
             }
         }
 
-        public ISynchronizableNotifyChangedCollection SourceCollection { get; private set; }
+        public ISynchronizableNotifyChangedCollection SourceCollection { get;}
 
-        public CompositeDisposable EventListeners { get; private set; }
+        public CompositeDisposable EventListeners { get;}
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            var threadSafeHandler = Interlocked.CompareExchange(ref CollectionChanged, null, null);
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, args);
-            }
-        }
-
-        protected void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            var threadSafeHandler = Interlocked.CompareExchange(ref PropertyChanged, null, null);
-
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, args);
-            }
-        }
+        private void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed) return;
-
-            if (disposing)
+            if (EventListeners.Count != 0)
             {
-                if (EventListeners.Count != 0)
-                {
-                    EventListeners.Dispose();
+                EventListeners.Dispose();
 
-                    if (_isDisposableType)
+                if (_isDisposableType)
+                {
+                    foreach (var unknown in this)
                     {
-                        foreach (var unknown in this)
-                        {
-                            var i = (IDisposable) unknown;
-                            i.Dispose();
-                        }
+                        var i = (IDisposable)unknown;
+                        i.Dispose();
                     }
                 }
             }
-            _disposed = true;
         }
     }
 
     public static class ReadOnlyNotifyChangedCollectionExtensions
     {
         public static ReadOnlyNotifyChangedCollection<T> ToSyncedReadOnlyNotifyChangedCollection<T>(
-            this ISynchronizableNotifyChangedCollection<T> source)
-        {
-            return new ReadOnlyNotifyChangedCollection<T>(source);
-        }
+            this ISynchronizableNotifyChangedCollection<T> source) => new ReadOnlyNotifyChangedCollection<T>(source);
     }
 }

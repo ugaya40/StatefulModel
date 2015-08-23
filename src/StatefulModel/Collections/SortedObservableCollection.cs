@@ -6,10 +6,10 @@ using System.Reflection;
 
 namespace StatefulModel
 {
-    public class SortedObservableCollection<TSource, TKey> : ObservableCollection<TSource>,ISynchronizableNotifyChangedCollection<TSource>
+    public sealed class SortedObservableCollection<TSource, TKey> : ObservableCollection<TSource>,ISynchronizableNotifyChangedCollection<TSource>
     {
-        private Func<TSource, TKey> _keySelector;
-        private IComparer<TKey> _comparer;
+        private readonly Func<TSource, TKey> _keySelector;
+        private readonly IComparer<TKey> _comparer;
 
         public SortedObservableCollection(Func<TSource, TKey> keySelector, bool isDescending = false)
             : this(Enumerable.Empty<TSource>(), keySelector, null, isDescending) { }
@@ -22,8 +22,8 @@ namespace StatefulModel
 
         public SortedObservableCollection(IEnumerable<TSource> collection, Func<TSource, TKey> keySelector, IComparer<TKey> comparer, bool isDescending = false)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
-            if (keySelector == null) throw new ArgumentNullException("keySelector");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
             _keySelector = keySelector;
 
@@ -87,16 +87,9 @@ namespace StatefulModel
             }
         }
 
-        public Synchronizer<TSource> Synchronizer
-        {
-            get;
-            private set;
-        }
+        public Synchronizer<TSource> Synchronizer { get; }
 
-        public void Dispose()
-        {
-            Synchronizer.Dispose();
-        }
+        public void Dispose() => Synchronizer.Dispose();
 
         private int FindNewIndex(TSource target)
         {
@@ -159,11 +152,11 @@ namespace StatefulModel
                 EndIndex = endIndex;
             }
 
-            public int StartIndex { get; private set; }
-            public int EndIndex { get; private set; }
-            public int CenterIndex { get { return (StartIndex + EndIndex) / 2; } }
-            public bool IsOne { get { return StartIndex == EndIndex; } }
-            public int Count { get { return EndIndex - StartIndex + 1; } }
+            public int StartIndex { get; }
+            public int EndIndex { get;}
+            public int CenterIndex => (StartIndex + EndIndex) / 2;
+            public bool IsOne => StartIndex == EndIndex;
+            public int Count => EndIndex - StartIndex + 1;
         }
     }
 
@@ -192,6 +185,10 @@ namespace StatefulModel
                     {
                         var removeSourceItem = (TSource)e.OldItems[0];
                         result.RemoveAt(result.IndexOf(removeSourceItem));
+                        if (isDisposableType)
+                        {
+                            ((IDisposable)removeSourceItem).Dispose();
+                        }
                     },
                     moveAction: e => { },
                     replaceAction: e =>
@@ -199,6 +196,10 @@ namespace StatefulModel
                         var removeSourceItem = (TSource)e.OldItems[0];
                         result.RemoveAt(result.IndexOf(removeSourceItem));
                         result.Add((TSource)e.NewItems[0]);
+                        if (isDisposableType)
+                        {
+                            ((IDisposable)removeSourceItem).Dispose();
+                        }
                     }
                     );
                 result.Synchronizer.EventListeners.Add(collectionChangedListener);

@@ -6,22 +6,18 @@ using System.Threading;
 
 namespace StatefulModel
 {
-    public class SynchronizationContextCollection<T> : ObservableCollection<T>,ISynchronizableNotifyChangedCollection<T>
+    public sealed class SynchronizationContextCollection<T> : ObservableCollection<T>,ISynchronizableNotifyChangedCollection<T>
     {
         public SynchronizationContextCollection(SynchronizationContext context) : this(Enumerable.Empty<T>(), context) { }
 
         public SynchronizationContextCollection(IEnumerable<T> collection, SynchronizationContext context) : base(collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
-            if (context == null) throw new ArgumentNullException("context");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (context == null) throw new ArgumentNullException(nameof(context));
             Synchronizer = new Synchronizer<T>(this);
             Context = context;
         }
-        public SynchronizationContext Context
-        {
-            get;
-            private set;
-        }
+        public SynchronizationContext Context { get; }
 
         protected override void InsertItem(int index, T item)
         {
@@ -55,31 +51,18 @@ namespace StatefulModel
             }
         }
 
-        private void DoOnContext(Action action)
-        {
-            Context.Send(_ => action(), null);
-        }
+        private void DoOnContext(Action action) => Context.Send(_ => action(), null);
 
-        public Synchronizer<T> Synchronizer
-        {
-            get;
-            private set;
-        }
+        public Synchronizer<T> Synchronizer { get; }
 
-        public void Dispose()
-        {
-            Synchronizer.Dispose();
-        }
+        public void Dispose() => Synchronizer.Dispose();
     }
 
     public static class SynchronizationContextCollectionExtensions
     {
         public static SynchronizationContextCollection<T> ToSyncedSynchronizationContextCollection<T>(
             this ISynchronizableNotifyChangedCollection<T> source,
-            SynchronizationContext context)
-        {
-            return ToSyncedSynchronizationContextCollection(source, _ => _, context);
-        }
+            SynchronizationContext context) => ToSyncedSynchronizationContextCollection(source, _ => _, context);
 
         public static SynchronizationContextCollection<TResult> ToSyncedSynchronizationContextCollection<TSource, TResult>(
             this ISynchronizableNotifyChangedCollection<TSource> source, 

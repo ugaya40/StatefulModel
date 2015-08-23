@@ -6,7 +6,7 @@ namespace StatefulModel.EventListeners.WeakEvents
 {
     public sealed class CollectionChangedWeakEventListener : WeakEventListener<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>, IEnumerable<KeyValuePair<NotifyCollectionChangedAction, List<NotifyCollectionChangedEventHandler>>>
     {
-        private AnonymousCollectionChangedEventHandlerBag _bag;
+        private readonly AnonymousCollectionChangedEventHandlerBag _bag;
 
         public CollectionChangedWeakEventListener(INotifyCollectionChanged source)
         {
@@ -59,16 +59,19 @@ namespace StatefulModel.EventListeners.WeakEvents
 
         public void Add(NotifyCollectionChangedEventHandler handler)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(handler);
         }
 
         public void Add(NotifyCollectionChangedAction action, NotifyCollectionChangedEventHandler handler)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(action, handler);
         }
 
         public void Add(NotifyCollectionChangedAction action, params NotifyCollectionChangedEventHandler[] handlers)
         {
+            ThrowExceptionIfDisposed();
             _bag.Add(action, handlers);
         }
     }

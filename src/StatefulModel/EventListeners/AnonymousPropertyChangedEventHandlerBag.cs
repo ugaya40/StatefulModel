@@ -7,15 +7,15 @@ namespace StatefulModel.EventListeners
 {
     internal class AnonymousPropertyChangedEventHandlerBag : IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>
     {
-        private Dictionary<string, List<PropertyChangedEventHandler>> _handlerDictionary = new Dictionary<string, List<PropertyChangedEventHandler>>();
-        private WeakReference<INotifyPropertyChanged> _source;
+        private readonly Dictionary<string, List<PropertyChangedEventHandler>> _handlerDictionary = new Dictionary<string, List<PropertyChangedEventHandler>>();
+        private readonly WeakReference<INotifyPropertyChanged> _source;
 
-        private object _handlerDictionaryLockObject = new object();
-        private Dictionary<List<PropertyChangedEventHandler>, object> _lockObjectDictionary = new Dictionary<List<PropertyChangedEventHandler>, object>();
+        private readonly object _handlerDictionaryLockObject = new object();
+        private readonly Dictionary<List<PropertyChangedEventHandler>, object> _lockObjectDictionary = new Dictionary<List<PropertyChangedEventHandler>, object>();
 
         internal AnonymousPropertyChangedEventHandlerBag(INotifyPropertyChanged source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
 
             _source = new WeakReference<INotifyPropertyChanged>(source);
         }
@@ -23,14 +23,11 @@ namespace StatefulModel.EventListeners
         internal AnonymousPropertyChangedEventHandlerBag(INotifyPropertyChanged source, PropertyChangedEventHandler handler)
             : this(source)
         {
-            if (handler == null) throw new ArgumentNullException("handler");
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
             RegisterHandler(handler);
         }
 
-        internal void RegisterHandler(PropertyChangedEventHandler handler)
-        {
-            RegisterHandler(string.Empty, handler);
-        }
+        internal void RegisterHandler(PropertyChangedEventHandler handler) => RegisterHandler(string.Empty, handler);
 
         internal void RegisterHandler(string propertyName, PropertyChangedEventHandler handler)
         {
@@ -91,26 +88,14 @@ namespace StatefulModel.EventListeners
             }
         }
 
-        IEnumerator<KeyValuePair<string, List<PropertyChangedEventHandler>>> IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>.GetEnumerator()
-        {
-            return _handlerDictionary.GetEnumerator();
-        }
+        IEnumerator<KeyValuePair<string, List<PropertyChangedEventHandler>>> IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>.GetEnumerator() 
+            => _handlerDictionary.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _handlerDictionary.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => _handlerDictionary.GetEnumerator();
 
-        internal void Add(PropertyChangedEventHandler handler)
-        {
-            RegisterHandler(handler);
-        }
+        internal void Add(PropertyChangedEventHandler handler) => RegisterHandler(handler);
 
-        internal void Add(string propertyName, PropertyChangedEventHandler handler)
-        {
-            RegisterHandler(propertyName, handler);
-        }
-
+        internal void Add(string propertyName, PropertyChangedEventHandler handler) => RegisterHandler(propertyName, handler);
 
         internal void Add(string propertyName, params PropertyChangedEventHandler[] handlers)
         {

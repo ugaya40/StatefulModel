@@ -4,13 +4,11 @@ using System.Reflection;
 
 namespace StatefulModel
 {
-    public class Synchronizer<T>
+    public class Synchronizer<T> : IDisposable
     {
-        private object _lockObject = new object();
-        private CompositeDisposable _listeners = new CompositeDisposable();
         protected bool Disposed;
 
-        private bool _isDisposableType;
+        private readonly bool _isDisposableType;
 
         public Synchronizer(IList<T> currentCollection)
         {
@@ -18,11 +16,11 @@ namespace StatefulModel
             _isDisposableType = typeof(IDisposable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
         }
 
-        public IList<T> CurrentCollection { get; private set; }
+        public IList<T> CurrentCollection { get; }
 
-        public CompositeDisposable EventListeners { get { return _listeners; } }
+        public CompositeDisposable EventListeners { get; } = new CompositeDisposable();
 
-        public object LockObject { get { return _lockObject; } }
+        public object LockObject { get; } = new object();
 
         public void Dispose()
         {
@@ -39,7 +37,6 @@ namespace StatefulModel
                 if (EventListeners.Count != 0)
                 {
                     EventListeners.Dispose();
-                    CurrentCollection.Clear();
                     if (_isDisposableType)
                     {
                         foreach (var unknown in CurrentCollection)
@@ -48,6 +45,7 @@ namespace StatefulModel
                             i.Dispose();
                         }
                     }
+                    CurrentCollection.Clear();
                 }
             }
             Disposed = true;

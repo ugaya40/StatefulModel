@@ -8,17 +8,16 @@ using System.Threading;
 
 namespace StatefulModel
 {
-    public class ObservableSynchronizedCollection<T> :ICollection, IReadOnlyList<T>, ISynchronizableNotifyChangedCollection<T>
+    public sealed class ObservableSynchronizedCollection<T> :ICollection, IReadOnlyList<T>, ISynchronizableNotifyChangedCollection<T>
     {
-        private IList<T> _list;
-        private object _syncRoot = new object();
-        private ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly IList<T> _list;
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         public ObservableSynchronizedCollection() : this(Enumerable.Empty<T>()) { }
 
         public ObservableSynchronizedCollection(IEnumerable<T> source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             _list = new List<T>(source);
             Synchronizer = new Synchronizer<T>(this);
         }
@@ -104,28 +103,13 @@ namespace StatefulModel
             });
         }
 
-        public bool Contains(T item)
-        {
-            return ReadWithLockAction(() => _list.Contains(item));
-        }
+        public bool Contains(T item) => ReadWithLockAction(() => _list.Contains(item));
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            ReadWithLockAction(() => _list.CopyTo(array, arrayIndex));
-        }
+        public void CopyTo(T[] array, int arrayIndex) => ReadWithLockAction(() => _list.CopyTo(array, arrayIndex));
 
-        public int Count
-        {
-            get
-            {
-                return ReadWithLockAction(() => _list.Count);
-            }
-        }
+        public int Count => ReadWithLockAction(() => _list.Count);
 
-        public bool IsReadOnly
-        {
-            get { return _list.IsReadOnly; }
-        }
+        public bool IsReadOnly => _list.IsReadOnly;
 
         public bool Remove(T item)
         {
@@ -164,50 +148,20 @@ namespace StatefulModel
                 });
         }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            return ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
-        }
+        public IEnumerator<T> GetEnumerator() => ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
-        }
+        IEnumerator IEnumerable.GetEnumerator() => ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
 
-        public void CopyTo(Array array, int index)
-        {
-            CopyTo(array.Cast<T>().ToArray(), index);
-        }
+        public void CopyTo(Array array, int index) => CopyTo(array.Cast<T>().ToArray(), index);
 
-        public bool IsSynchronized
-        {
-            get { return true; }
-        }
+        public bool IsSynchronized => true;
 
-        public object SyncRoot
-        {
-            get { return _syncRoot; }
-        }
+        public object SyncRoot { get; } = new object();
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            var threadSafeHandler = Interlocked.CompareExchange(ref CollectionChanged, null, null);
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, args);
-            }
-        }
 
-        protected void OnPropertyChanged(string propertyName)
-        {
-            var threadSafeHandler = Interlocked.CompareExchange(ref PropertyChanged, null, null);
-
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+        private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
         private void ReadWithLockAction(Action readAction)
@@ -326,25 +280,15 @@ namespace StatefulModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Synchronizer<T> Synchronizer
-        {
-            get;
-            private set;
-        }
+        public Synchronizer<T> Synchronizer{get;}
 
-        public void Dispose()
-        {
-            Synchronizer.Dispose();
-        }
+        public void Dispose() => Synchronizer.Dispose();
     }
 
     public static class ObservableSynchronizedCollectionExtensions
     {
         public static ObservableSynchronizedCollection<T> ToSyncedObservableSynchronizedCollection<T>(
-            this ISynchronizableNotifyChangedCollection<T> source)
-        {
-            return ToSyncedObservableSynchronizedCollection(source, _ => _);
-        }
+            this ISynchronizableNotifyChangedCollection<T> source) => ToSyncedObservableSynchronizedCollection(source, _ => _);
 
         public static ObservableSynchronizedCollection<TResult> ToSyncedObservableSynchronizedCollection<TSource, TResult>(
             this ISynchronizableNotifyChangedCollection<TSource> source,

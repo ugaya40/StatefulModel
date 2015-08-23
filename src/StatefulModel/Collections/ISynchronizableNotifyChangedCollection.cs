@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
-using StatefulModel.EventListeners;
 using StatefulModel.EventListeners.WeakEvents;
 
 namespace StatefulModel

@@ -9,7 +9,7 @@ namespace StatefulModel.EventListeners
         private Action<THandler> _remove;
         private bool _disposed;
 
-        private bool _initialized;
+        private readonly bool _initialized;
 
         public EventListener(Action<THandler> add, Action<THandler> remove, THandler handler)
         {
@@ -26,9 +26,9 @@ namespace StatefulModel.EventListeners
         {
             if (_initialized) return;
 
-            if (add == null) throw new ArgumentNullException("add");
-            if (remove == null) throw new ArgumentNullException("remove");
-            if (handler == null) throw new ArgumentNullException("handler");
+            if (add == null) throw new ArgumentNullException(nameof(add));
+            if (remove == null) throw new ArgumentNullException(nameof(remove));
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
 
             _add = add;
             _handler = handler;

@@ -6,7 +6,7 @@ namespace StatefulModel.EventListeners.WeakEvents
 {
     public sealed class PropertyChangedWeakEventListener : WeakEventListener<PropertyChangedEventHandler, PropertyChangedEventArgs>, IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>
     {
-        private AnonymousPropertyChangedEventHandlerBag _bag;
+        private readonly AnonymousPropertyChangedEventHandlerBag _bag;
 
         public PropertyChangedWeakEventListener(INotifyPropertyChanged source)
         {

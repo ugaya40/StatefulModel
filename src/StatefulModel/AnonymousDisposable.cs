@@ -4,7 +4,7 @@ namespace StatefulModel
 {
     public class AnonymousDisposable : IDisposable
     {
-        private Action _releaseAction;
+        private readonly Action _releaseAction;
         private bool _disposed;
 
         public AnonymousDisposable(Action releaseAction)

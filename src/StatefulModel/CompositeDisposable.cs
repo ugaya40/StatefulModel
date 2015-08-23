@@ -6,9 +6,9 @@ namespace StatefulModel
 {
     public class CompositeDisposable : IDisposable, ICollection<IDisposable>
     {
-        private List<IDisposable> _targetLists;
+        private readonly List<IDisposable> _targetLists;
         private bool _disposed;
-        private object _lockObject = new object();
+        private readonly object _lockObject = new object();
 
         public CompositeDisposable()
         {
@@ -17,7 +17,7 @@ namespace StatefulModel
 
         public CompositeDisposable(IEnumerable<IDisposable> sourceDisposableList)
         {
-            if (sourceDisposableList == null) throw new ArgumentNullException("sourceDisposableList");
+            if (sourceDisposableList == null) throw new ArgumentNullException(nameof(sourceDisposableList));
 
             _targetLists = new List<IDisposable>(sourceDisposableList);
         }

@@ -6,7 +6,7 @@ namespace StatefulModel.EventListeners
 {
     public sealed class PropertyChangedEventListener : EventListener<PropertyChangedEventHandler>, IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>
     {
-        private AnonymousPropertyChangedEventHandlerBag _bag;
+        private readonly AnonymousPropertyChangedEventHandlerBag _bag;
 
         public PropertyChangedEventListener(INotifyPropertyChanged source)
         {
@@ -32,19 +32,12 @@ namespace StatefulModel.EventListeners
             _bag.RegisterHandler(propertyName, handler);
         }
 
-        IEnumerator<KeyValuePair<string, List<PropertyChangedEventHandler>>> IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>.GetEnumerator()
-        {
-            ThrowExceptionIfDisposed();
-            return
-                ((IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>)_bag)
-                    .GetEnumerator();
-        }
+        IEnumerator<KeyValuePair<string, List<PropertyChangedEventHandler>>> IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>.GetEnumerator() 
+            => ((IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>)_bag)
+            .GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            ThrowExceptionIfDisposed();
-            return ((IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>)_bag).GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() 
+            => ((IEnumerable<KeyValuePair<string, List<PropertyChangedEventHandler>>>)_bag).GetEnumerator();
 
         public void Add(PropertyChangedEventHandler handler)
         {
