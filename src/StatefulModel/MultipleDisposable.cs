@@ -4,18 +4,18 @@ using System.Collections.Generic;
 
 namespace StatefulModel
 {
-    public class CompositeDisposable : IDisposable, ICollection<IDisposable>
+    public class MultipleDisposable : IDisposable, ICollection<IDisposable>
     {
         private readonly List<IDisposable> _targetLists;
         private bool _disposed;
         private readonly object _lockObject = new object();
 
-        public CompositeDisposable()
+        public MultipleDisposable()
         {
             _targetLists = new List<IDisposable>();
         }
 
-        public CompositeDisposable(IEnumerable<IDisposable> sourceDisposableList)
+        public MultipleDisposable(IEnumerable<IDisposable> sourceDisposableList)
         {
             if (sourceDisposableList == null) throw new ArgumentNullException(nameof(sourceDisposableList));
 

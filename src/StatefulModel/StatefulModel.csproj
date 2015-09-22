@@ -44,7 +44,7 @@
     <Compile Include="EventListeners\WeakEvents\CollectionChangedWeakEventListener.cs" />
     <Compile Include="EventListeners\WeakEvents\PropertyChangedWeakEventListener.cs" />
     <Compile Include="EventListeners\WeakEvents\WeakEventListener.cs" />
-    <Compile Include="CompositeDisposable.cs" />
+    <Compile Include="MultipleDisposable.cs" />
     <Compile Include="Collections\ObservableSynchronizedCollection.cs" />
     <Compile Include="EventListeners\AnonymousCollectionChangedEventHandlerBag.cs" />
     <Compile Include="EventListeners\AnonymousPropertyChangedEventHandlerBag.cs" />

@@ -18,7 +18,7 @@ namespace StatefulModel
 
         public IList<T> CurrentCollection { get; }
 
-        public CompositeDisposable EventListeners { get; } = new CompositeDisposable();
+        public MultipleDisposable EventListeners { get; } = new MultipleDisposable();
 
         public object LockObject { get; } = new object();
 

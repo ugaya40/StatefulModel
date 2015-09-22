@@ -16,7 +16,7 @@ namespace StatefulModel
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
 
-            EventListeners = new CompositeDisposable();
+            EventListeners = new MultipleDisposable();
 
             _isDisposableType = typeof(IDisposable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
 
@@ -31,7 +31,7 @@ namespace StatefulModel
 
         public ISynchronizableNotifyChangedCollection SourceCollection { get;}
 
-        public CompositeDisposable EventListeners { get;}
+        public MultipleDisposable EventListeners { get;}
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
