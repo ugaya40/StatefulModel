@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>StatefulModel</id>
-        <version>0.2.0</version> <!-- Depends on AssemblyVersionAttribute -->
+        <version>0.3.0</version>
         <title>StatefulModel</title>
         <authors>Masanori Onoue (@ugaya40)</authors>
         <owners>Masanori Onoue (@ugaya40)</owners>
@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>these classes are frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</description>
         <summary>these classes are frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</summary>
-        <copyright>Copyright (C) Masanori Onoue,  2015</copyright>
+        <copyright>Copyright (C) Masanori Onoue (@ugaya40),  2015</copyright>
         <language>en-US</language>
         <tags>MVVM</tags>
     </metadata>
