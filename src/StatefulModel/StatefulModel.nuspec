@@ -2,15 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>StatefulModel</id>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
         <title>StatefulModel</title>
         <authors>Masanori Onoue (@ugaya40)</authors>
         <owners>Masanori Onoue (@ugaya40)</owners>
         <licenseUrl>https://github.com/ugaya40/StatefulModel/blob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/ugaya40/StatefulModel</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>these classes are frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</description>
-        <summary>these classes are frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</summary>
+        <description>Frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</description>
+        <summary>Frequent use of stateful Models for M-V-Whatever. example,synced - ObservableCollection etc.</summary>
         <copyright>Copyright (C) Masanori Onoue (@ugaya40),  2015</copyright>
         <language>en-US</language>
         <tags>MVVM</tags>
