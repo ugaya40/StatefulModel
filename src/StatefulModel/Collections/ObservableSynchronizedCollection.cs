@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace StatefulModel
 {
-    public sealed class ObservableSynchronizedCollection<T> :ICollection, IReadOnlyList<T>, ISynchronizableNotifyChangedCollection<T>
+    public sealed class ObservableSynchronizedCollection<T> :ICollection, IList, IReadOnlyList<T>, ISynchronizableNotifyChangedCollection<T>
     {
         private readonly IList<T> _list;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -152,12 +152,6 @@ namespace StatefulModel
 
         IEnumerator IEnumerable.GetEnumerator() => ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
 
-        public void CopyTo(Array array, int index) => CopyTo(array.Cast<T>().ToArray(), index);
-
-        public bool IsSynchronized => true;
-
-        public object SyncRoot { get; } = new object();
-
         private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
 
@@ -283,6 +277,30 @@ namespace StatefulModel
         public Synchronizer<T> Synchronizer{get;}
 
         public void Dispose() => Synchronizer.Dispose();
+
+        #region ICollection(non-generic) support
+        void ICollection.CopyTo(Array array, int index) => CopyTo(array.Cast<T>().ToArray(), index);
+        bool ICollection.IsSynchronized { get; } = false;
+        object ICollection.SyncRoot { get; } = new object();
+        #endregion
+
+        #region IList(non-generic) support
+        object IList.this[int index]
+        {
+            get { return _list[index]; }
+            set { this[index] = (T)value; }
+        }
+        void IList.Remove(object value) => Remove((T)value);
+        bool IList.IsFixedSize { get; } = false;
+        int IList.Add(object value)
+        {
+            Add((T)value);
+            return _list.Count - 1;
+        }
+        bool IList.Contains(object value) => Contains((T)value);
+        int IList.IndexOf(object value) => IndexOf((T)value);
+        void IList.Insert(int index, object value) => Insert(index, (T)value);
+        #endregion
     }
 
     public static class ObservableSynchronizedCollectionExtensions

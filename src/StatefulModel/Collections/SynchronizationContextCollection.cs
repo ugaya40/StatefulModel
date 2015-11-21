@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using StatefulModel.Collections;
 
 namespace StatefulModel
 {
-    public sealed class SynchronizationContextCollection<T> : ObservableCollection<T>,ISynchronizableNotifyChangedCollection<T>
+    public sealed class SynchronizationContextCollection<T> : NotifyChangedCollection<T>,ISynchronizableNotifyChangedCollection<T>
     {
         public SynchronizationContextCollection(SynchronizationContext context) : this(Enumerable.Empty<T>(), context) { }
 
@@ -17,41 +18,24 @@ namespace StatefulModel
             Synchronizer = new Synchronizer<T>(this);
             Context = context;
         }
+
+        protected override void InsertItem(int index, T newItem) => DoActionWithLockOnContext(() => base.InsertItem(index, newItem));
+        protected override void RemoveItem(int index) => DoActionWithLockOnContext(() => base.RemoveItem(index));
+        protected override void ReplaceItem(int index, T newItem) => DoActionWithLockOnContext(() => base.ReplaceItem(index, newItem));
+        protected override void MoveItem(int oldIndex, int newIndex) => DoActionWithLockOnContext(() => base.MoveItem(oldIndex,newIndex));
+        protected override void ClearItems() => DoActionWithLockOnContext(base.ClearItems);
+
+        public void Move(int oldIndex, int newIndex) => MoveItem(oldIndex, newIndex);
+
         public SynchronizationContext Context { get; }
 
-        protected override void InsertItem(int index, T item)
+        private void DoActionWithLockOnContext(Action action)
         {
             lock (Synchronizer.LockObject)
             {
-                DoOnContext(() => base.InsertItem(index, item));
+                Context.Post(_ => action(), null);
             }
         }
-
-        protected override void RemoveItem(int index)
-        {
-            lock (Synchronizer.LockObject)
-            {
-                DoOnContext(() => base.RemoveItem(index));
-            }
-        }
-
-        protected override void SetItem(int index, T item)
-        {
-            lock (Synchronizer.LockObject)
-            {
-                DoOnContext(() => base.SetItem(index, item));
-            }
-        }
-
-        protected override void ClearItems()
-        {
-            lock (Synchronizer.LockObject)
-            {
-                DoOnContext(() => base.ClearItems());
-            }
-        }
-
-        private void DoOnContext(Action action) => Context.Send(_ => action(), null);
 
         public Synchronizer<T> Synchronizer { get; }
 
