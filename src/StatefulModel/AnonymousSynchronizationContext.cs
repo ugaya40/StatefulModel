@@ -8,6 +8,8 @@ namespace StatefulModel
         private Action<SendOrPostCallback> _syncCallback;
         private Action<SendOrPostCallback> _asyncCallback;
 
+        private AnonymousSynchronizationContext() { }
+
         public static AnonymousSynchronizationContext CreateForSync(Action<SendOrPostCallback> callback)
         {
             return Create(callback, null);

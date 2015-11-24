@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using StatefulModel.Collections;
 
 namespace StatefulModel
 {
@@ -32,9 +33,9 @@ namespace StatefulModel
             ReadAndWriteWithLockAction(() => _list.Insert(index, item),
                 () =>
                 {
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+                    PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+                    PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
                 });
         }
 
@@ -44,9 +45,9 @@ namespace StatefulModel
                 removeItem => _list.RemoveAt(index),
                 removeItem =>
                 {
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removeItem, index));
+                    PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+                    PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removeItem, index));
                 });
         }
 
@@ -65,8 +66,8 @@ namespace StatefulModel
                     },
                     oldItem =>
                     {
-                        OnPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], oldItem, index));
+                        PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], oldItem, index));
                     });
             }
         }
@@ -76,9 +77,9 @@ namespace StatefulModel
             ReadAndWriteWithLockAction(() => _list.Add(item),
                 () =>
                 {
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count - 1));
+                    PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+                    PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count - 1));
                 });
         }
 
@@ -96,9 +97,9 @@ namespace StatefulModel
             {
                 if (count != 0)
                 {
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+                    PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                 }
             });
         }
@@ -124,9 +125,9 @@ namespace StatefulModel
                 {
                     if (result)
                     {
-                        OnPropertyChanged("Count");
-                        OnPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+                        PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+                        PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
                     }
                 });
 
@@ -143,19 +144,14 @@ namespace StatefulModel
                 },
                 item =>
                 {
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex));
+                    PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex));
                 });
         }
 
         public IEnumerator<T> GetEnumerator() => ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
 
         IEnumerator IEnumerable.GetEnumerator() => ReadWithLockAction(() => ((IEnumerable<T>)_list.ToArray()).GetEnumerator());
-
-        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
-
-
-        private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
         private void ReadWithLockAction(Action readAction)

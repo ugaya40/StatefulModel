@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace StatefulModel.Collections
 {
-    public abstract class NotifyChangedCollection
+    internal static class EventArguments
     {
-        protected static readonly PropertyChangedEventArgs CountPropertyChangedEventArgs = new PropertyChangedEventArgs("Count");
-        protected static readonly PropertyChangedEventArgs ItemPropertyChangedEventArgs = new PropertyChangedEventArgs("Item[]");
+        public static readonly PropertyChangedEventArgs CountPropertyChangedEventArgs = new PropertyChangedEventArgs("Count");
+        public static readonly PropertyChangedEventArgs ItemPropertyChangedEventArgs = new PropertyChangedEventArgs("Item[]");
     }
 
 
-    public class NotifyChangedCollection<T>:NotifyChangedCollection, IList<T>, IList, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    public class NotifyChangedCollection<T>:IList<T>, IList, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
     {
         private readonly IList<T> _list;
 
@@ -39,8 +39,8 @@ namespace StatefulModel.Collections
         protected virtual void InsertItem(int index,T newItem)
         {
             _list.Insert(index,newItem);
-            PropertyChanged?.Invoke(this, CountPropertyChangedEventArgs);
-            PropertyChanged?.Invoke(this, ItemPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,newItem,index));
         }
 
@@ -48,8 +48,8 @@ namespace StatefulModel.Collections
         {
             var item = _list[index];
             _list.RemoveAt(index);
-            PropertyChanged?.Invoke(this, CountPropertyChangedEventArgs);
-            PropertyChanged?.Invoke(this, ItemPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
         }
 
@@ -57,7 +57,7 @@ namespace StatefulModel.Collections
         {
             var oldItem = _list[index];
             _list[index] = newItem;
-            PropertyChanged?.Invoke(this, ItemPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
         }
 
@@ -66,16 +66,16 @@ namespace StatefulModel.Collections
             var item = _list[oldIndex];
             _list.RemoveAt(oldIndex);
             _list.Insert(newIndex,item);
-            PropertyChanged?.Invoke(this,ItemPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
             CollectionChanged?.Invoke(this,new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move,item,newIndex,oldIndex));
         }
 
         protected virtual void ClearItems()
         {
             if(_list.Count == 0) return;
-
-            PropertyChanged?.Invoke(this, CountPropertyChangedEventArgs);
-            PropertyChanged?.Invoke(this, ItemPropertyChangedEventArgs);
+            _list.Clear();
+            PropertyChanged?.Invoke(this, EventArguments.CountPropertyChangedEventArgs);
+            PropertyChanged?.Invoke(this, EventArguments.ItemPropertyChangedEventArgs);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 

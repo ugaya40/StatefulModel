@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using StatefulModel.Collections;
 
 namespace StatefulModel
 {
-    public sealed class SortedObservableCollection<TSource, TKey> : ObservableCollection<TSource>,ISynchronizableNotifyChangedCollection<TSource>
+    public sealed class SortedObservableCollection<TSource, TKey> : NotifyChangedCollection<TSource>,ISynchronizableNotifyChangedCollection<TSource>
     {
         private readonly Func<TSource, TKey> _keySelector;
         private readonly IComparer<TKey> _comparer;
@@ -73,10 +74,13 @@ namespace StatefulModel
             }
         }
 
-        protected override void SetItem(int index, TSource item)
+        protected override void ReplaceItem(int index, TSource newItem)
         {
-            RemoveItem(index);
-            InsertItem(FindNewIndex(item), item);
+            lock (Synchronizer.LockObject)
+            {
+                base.RemoveItem(index);
+                base.InsertItem(FindNewIndex(newItem), newItem);
+            }
         }
 
         protected override void ClearItems()
@@ -85,6 +89,11 @@ namespace StatefulModel
             {
                 base.ClearItems();
             }
+        }
+
+        public void Move(int oldIndex, int newIndex)
+        {
+            MoveItem(oldIndex,newIndex);
         }
 
         public Synchronizer<TSource> Synchronizer { get; }
