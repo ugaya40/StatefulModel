@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="AnonymousComparer.cs" />
     <Compile Include="AnonymousDisposable.cs" />
+    <Compile Include="Collections\FilteredObservableCollection.cs" />
     <Compile Include="Collections\NotifyChangedCollection.cs" />
     <Compile Include="Collections\Synchronizer.cs" />
     <Compile Include="Collections\ISynchronizableNotifyChangedCollection.cs" />

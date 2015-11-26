@@ -29,7 +29,7 @@ namespace StatefulModel
             }
         }
 
-        public ISynchronizableNotifyChangedCollection SourceCollection { get;}
+        public ISynchronizableNotifyChangedCollection<T> SourceCollection { get;}
 
         public MultipleDisposable EventListeners { get;}
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using StatefulModel.Collections;
@@ -76,11 +75,8 @@ namespace StatefulModel
 
         protected override void ReplaceItem(int index, TSource newItem)
         {
-            lock (Synchronizer.LockObject)
-            {
-                base.RemoveItem(index);
-                base.InsertItem(FindNewIndex(newItem), newItem);
-            }
+            RemoveItem(index);
+            InsertItem(FindNewIndex(newItem), newItem);
         }
 
         protected override void ClearItems()
