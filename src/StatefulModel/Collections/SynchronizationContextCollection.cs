@@ -55,11 +55,7 @@ namespace StatefulModel
         {
             lock (source.Synchronizer.LockObject)
             {
-                var result = new SynchronizationContextCollection<TResult>(context);
-                foreach (var item in source)
-                {
-                    result.Add(converter(item));
-                }
+                var result = new SynchronizationContextCollection<TResult>(source.Select(converter),context);
 
                 var collectionChangedListener = SynchronizableNotifyChangedCollectionHelper.CreateSynchronizableCollectionChangedEventListener(source, result,
                     converter);
